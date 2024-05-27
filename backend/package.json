@@ -1,0 +1,23 @@
+{
+  "name": "alx-portfolio-backend",
+  "version": "1.0.0",
+  "description": "The backend functionality for alx-portfolio which powers the image to pdf upload",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "backend",
+    "node",
+    "image",
+    "to",
+    "pdf"
+  ],
+  "author": "Oluwabusola Adeleke",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "pdfkit": "^0.15.0"
+  }
+}
