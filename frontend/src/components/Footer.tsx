@@ -39,7 +39,7 @@ export default function Footer() {
         textAlign: { sm: 'left', md: 'left' },
       }}
     >
-      <Box
+      {/* <Box
         sx={{
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
@@ -88,7 +88,7 @@ export default function Footer() {
             </Stack>
           </Box>
         </Box>
-        {/* <Box
+        <Box
           sx={{
             display: { xs: 'none', sm: 'flex' },
             flexDirection: 'column',
@@ -153,8 +153,8 @@ export default function Footer() {
           <Link color="text.secondary" variant="body2" href="#">
             Contact
           </Link>
-        </Box> */}
-      </Box>
+        </Box>
+      </Box> */}
       <Box
         sx={{
           display: 'flex',

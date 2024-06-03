@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PaletteMode } from '@mui/material';
+import { PaletteMode, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -81,7 +81,7 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
               px: 0,
             }}
           >
-            <SitemarkIcon />
+            <Typography sx={{color: "blue"}}>Bababusola</Typography>
             {/* <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
               <Button
                 variant="text"
@@ -165,7 +165,7 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                   </IconButton>
                 </Box>
                 <Divider sx={{ my: 3 }} />
-                <MenuItem onClick={() => scrollToSection('features')}>
+                {/* <MenuItem onClick={() => scrollToSection('features')}>
                   Features
                 </MenuItem>
                 <MenuItem onClick={() => scrollToSection('testimonials')}>
@@ -177,7 +177,7 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                 <MenuItem onClick={() => scrollToSection('pricing')}>
                   Pricing
                 </MenuItem>
-                <MenuItem onClick={() => scrollToSection('faq')}>FAQ</MenuItem>
+                <MenuItem onClick={() => scrollToSection('faq')}>FAQ</MenuItem> */}
                 <MenuItem>
                   <Button color="primary" variant="contained" fullWidth>
                     Sign up
