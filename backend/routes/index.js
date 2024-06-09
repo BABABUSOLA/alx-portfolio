@@ -1,6 +1,7 @@
-import { Router } from "express";
-import FilesController from "../controllers/files.controller.js";
+const Router = require("express");
+const FilesControllers = require("../controllers/FilesControllers.js");
 
 const router = Router();
+router.post("/upload", FilesControllers.uploadFile);
 
-router.post("/upload", FilesController.uploadFile);
+module.exports = router;
