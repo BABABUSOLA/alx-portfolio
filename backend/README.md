@@ -12,9 +12,9 @@
 
 
 
----------------------------------------------
+## -----------------------------------------------------------------------
 
-## Deployment
+## Initial Deployment to Google Cloud Run
 
 Sure, I can guide you through the process of deploying your Node.js Express app to Google Cloud. Here are the steps:
 
@@ -34,7 +34,7 @@ Please replace the placeholders with your actual project details. Also, make sur
 
 Let me know if you need further assistance! 😊
 
-
+## ---------------------------------------------------------------------------------------------
 ## Continuos deployment with docker
 # Stage all changes
 git add .
