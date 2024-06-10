@@ -1,14 +1,18 @@
 import React from 'react';
-// import logo from './logo.svg';
-// import './App.css';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import SignUp from './components/authentication/signup';
 import SignIn from './components/authentication/signin';
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/dashboard';
+// Create a client
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <LandingPage />
+    <QueryClientProvider client={queryClient}>
+
+      <LandingPage />
+    </QueryClientProvider>
   );
 }
 

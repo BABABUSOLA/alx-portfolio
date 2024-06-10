@@ -13,6 +13,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useMutation } from 'react-query';
+import axios from 'axios';
 
 const StyledBox = styled('div')(({ theme }) => ({
   alignSelf: 'center',
@@ -50,6 +52,26 @@ export default function Hero() {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      console.log(files);
+    }
+  }
+
+  const mutation = useMutation((data: FormData) =>
+    axios.post('http://localhost:5000', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+  );
+  
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    mutation.mutate(formData);
+  }
   return (
     <Box
       id="hero"
@@ -130,6 +152,12 @@ export default function Hero() {
             //     },
             //   }}
             /> */}
+
+            {/* <label htmlFor="raised-button-file">
+              <Button variant="contained" color="primary" size="large" component="span">
+                Upload now
+              </Button>
+            </label> */}
             <Button variant="contained" color="primary" size="large" onClick={handleClickOpen} >
               Upload now
             </Button>
@@ -147,14 +175,15 @@ export default function Hero() {
           onClose={handleClose}
           PaperProps={{
             component: 'form',
-            onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-              event.preventDefault();
-              const formData = new FormData(event.currentTarget);
-              const formJson = Object.fromEntries((formData as any).entries());
-              const email = formJson.email;
-              console.log(email);
-              handleClose();
-            },
+            // onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+            //   event.preventDefault();
+            //   const formData = new FormData(event.currentTarget);
+            //   const formJson = Object.fromEntries((formData as any).entries());
+            //   // const email = formJson.email;
+            //   console.log(formData, formJson,'the formdata and the form json');
+            //   // handleClose();
+            // },
+            onSubmit: onSubmit
           }}
         >
           <DialogTitle>Images per page</DialogTitle>
@@ -172,6 +201,14 @@ export default function Hero() {
               type="number"
               fullWidth
               variant="standard"
+            />
+            <input
+              accept="image/*"
+              // style={{ display: 'none' }}
+              id="raised-button-file"
+              multiple
+              type="file"
+              onChange={handleFileChange}
             />
           </DialogContent>
           <DialogActions>
