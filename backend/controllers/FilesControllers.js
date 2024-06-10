@@ -37,14 +37,17 @@ class FilesControllers {
                 const pageWidth = 595.28; // A4 size width in points
                 const pageHeight = 841.89; // A4 size height in points
                 const margin = 50;
+                let grid = Math.ceil(Math.sqrt(imagesPerPage));
 
                 let cellWidth, cellHeight;
                 if (imagesPerPage === 2) {
                     cellWidth = pageWidth - 2 * margin;
                     cellHeight = (pageHeight - 2 * margin) / 2;
                 } else {
-                    cellWidth = (pageWidth - 2 * margin) / 2;
-                    cellHeight = (pageHeight - 2 * margin) / 2;
+                    cellWidth = (pageWidth - 2 * margin) / grid;
+                    cellHeight = (pageHeight - 2 * margin) / grid;
+                    // cellWidth = (pageWidth - 2 * margin) / 2;
+                    // cellHeight = (pageHeight - 2 * margin) / 2;
                 }
 
                 for (let i = 0; i < files.length; i++) {
@@ -73,8 +76,10 @@ class FilesControllers {
                         x = margin + (cellWidth - displayWidth) / 2;
                         y = page.getHeight() - margin - (i % 2) * cellHeight - displayHeight - (cellHeight - displayHeight) / 2;
                     } else {
-                        x = margin + (i % 2) * cellWidth + (cellWidth - displayWidth) / 2;
-                        y = page.getHeight() - margin - Math.floor((i % imagesPerPage) / 2) * cellHeight - displayHeight - (cellHeight - displayHeight) / 2;
+                        // x = margin + (i % 2) * cellWidth + (cellWidth - displayWidth) / 2;
+                        // y = page.getHeight() - margin - Math.floor((i % imagesPerPage) / 2) * cellHeight - displayHeight - (cellHeight - displayHeight) / 2;
+                        x = margin + (i % grid) * cellWidth + (cellWidth - displayWidth) / 2;
+                        y = page.getHeight() - margin - Math.floor((i % imagesPerPage) / grid) * cellHeight - displayHeight - (cellHeight - displayHeight) / 2;
                     }
 
                     // Draw image
@@ -86,15 +91,15 @@ class FilesControllers {
                     });
 
                     // Draw dotted border
-                    page.drawRectangle({
-                        x: imagesPerPage === 2 ? margin : margin + (i % 2) * cellWidth,
-                        y: imagesPerPage === 2 ? page.getHeight() - margin - Math.floor((i % imagesPerPage) / 2) * cellHeight - cellHeight : page.getHeight() - margin - Math.floor((i % imagesPerPage) / 2) * cellHeight - cellHeight,
-                        width: cellWidth,
-                        height: cellHeight,
-                        borderColor: rgb(0, 0, 0),
-                        borderWidth: 1,
-                        borderDashArray: [5],
-                    });
+                    // page.drawRectangle({
+                    //     x,
+                    //     y: imagesPerPage === 2 ? page.getHeight() - margin - Math.floor((i % imagesPerPage) / 2) * cellHeight - displayHeight : page.getHeight() - margin - Math.floor((i % imagesPerPage) / 2) * cellHeight - displayHeight,
+                    //     width: cellWidth,
+                    //     height: cellHeight,
+                    //     borderColor: rgb(0, 0, 0),
+                    //     borderWidth: 1,
+                    //     borderDashArray: [5],
+                    // });
                 }
 
                 const pdfBytes = await pdfDoc.save();
