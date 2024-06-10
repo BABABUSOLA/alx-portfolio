@@ -35,7 +35,7 @@ Please replace the placeholders with your actual project details. Also, make sur
 Let me know if you need further assistance! 😊
 
 
-## Continuos deployment
+## Continuos deployment with docker
 # Stage all changes
 git add .
 
@@ -44,6 +44,21 @@ git commit -m "Your commit message"
 
 # Build the container image
 gcloud builds submit --tag gcr.io/PROJECT-ID/SERVICE-NAME
+
+# Deploy the image to Cloud Run
+gcloud run deploy SERVICE-NAME --image gcr.io/PROJECT-ID/SERVICE-NAME --region REGION
+
+## -------------------------------------------------------------------------------------------
+## Continues deployment with git bash
+
+# Stage all changes
+git add .
+
+# Commit changes
+git commit -m "Your commit message"
+
+# Build the container image
+gcloud builds submit --pack image=gcr.io/PROJECT-ID/SERVICE-NAME
 
 # Deploy the image to Cloud Run
 gcloud run deploy SERVICE-NAME --image gcr.io/PROJECT-ID/SERVICE-NAME --region REGION
