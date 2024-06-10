@@ -3,10 +3,13 @@ const { Storage } = require("@google-cloud/storage");
 const multer = require("multer");
 const { PDFDocument, rgb } = require('pdf-lib');
 const sharp = require('sharp');
+const accessSecret = require('../secret.js');
 
+const secret  = await accessSecret();
 const storage = new Storage({
-    keyFilename: "./key.json",
+    credentials: secret
 });
+
 const bucket = storage.bucket("alx_portfolio_image_to_pdf_converter");
 
 const upload = multer({
