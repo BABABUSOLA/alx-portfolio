@@ -1,164 +1,158 @@
+// const { v4: uuidv4 } = require('uuid');
+// const { Storage } = require("@google-cloud/storage");
+// const multer = require("multer");
+// const { PDFDocument, rgb } = require('pdf-lib');
+
+// const storage = new Storage({
+//     keyFilename: "./key.json",
+// });
+// const bucket = storage.bucket("alx_portfolio_image_to_pdf_converter");
+
+// const upload = multer({
+//     storage: multer.memoryStorage(),
+//     limits: {
+//         fileSize: 5 * 1024 * 1024, // Limit file size to 5MB
+//     },
+// });
+
+// class FilesControllers {
+
+//     static async uploadFile(request, response) {
+//         upload.array('images', 10)(request, response, async (err) => {
+//             if (err) {
+//                 return response.status(500).json({ error: err.message });
+//             }
+//             const { img_per_page } = request.body;
+//             if (!img_per_page) return response.status(400).json({ error: "Missing Max image per page" });
+
+//             const files = request.files;
+//             if (files?.length === 0) {
+//                 return response.status(400).json({ error: 'No files in request' });
+//             }
+
+//             try {
+//                 const pdfDoc = await PDFDocument.create();
+//                 let page = null;
+//                 let imagesPerPage = parseInt(img_per_page, 10);
+//                 for (let i = 0; i < files.length; i++) {
+//                     if (i % imagesPerPage === 0) {
+//                         page = pdfDoc.addPage();
+//                     }
+//                     const img = await pdfDoc.embedJpg(files[i].buffer);
+//                     const { width, height } = img.scale(0.5);
+//                     page.drawImage(img, {
+//                         x: 50,
+//                         y: page.getHeight() - (i % imagesPerPage + 1) * height - 50,
+//                         width,
+//                         height,
+//                     });
+//                 }
+//                 const pdfBytes = await pdfDoc.save();
+//                 const blob = bucket.file(`uploaded_${uuidv4()}.pdf`);
+//                 const blobStream = blob.createWriteStream();
+
+//                 blobStream.on('error', (err) => {
+//                     console.error(err);
+//                     return response.status(500).json({ error: err.message });
+//                 });
+
+//                 blobStream.on('finish', () => {
+//                     response.status(200).json({ message: "PDF uploaded successfully" });
+//                 });
+
+//                 blobStream.end(pdfBytes);
+//             } catch (error) {
+//                 console.error(error);
+//                 response.status(500).json({ error: error.message });
+//             }
+//         });
+//     }
+
+//     static async getFile(request, response) {
+//         console.log(request, response, 'the response and request');
+//     }
+// }
+
+// module.exports = FilesControllers;
+
+
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs').promises;
-// const { ObjectID } = require('mongodb');
-// const mime = require('mime-types');
-// const dbClient = require('../utils/db');
+const { Storage } = require("@google-cloud/storage");
+const multer = require("multer");
+const { PDFDocument } = require('pdf-lib');
+const sharp = require('sharp');
 
+const storage = new Storage({
+    keyFilename: "./key.json",
+});
+const bucket = storage.bucket("alx_portfolio_image_to_pdf_converter");
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // Limit file size to 5MB
+    },
+});
 
 class FilesControllers {
 
     static async uploadFile(request, response) {
-        const user = await FilesController.getUser(request);
-        if (!user) {
-            return response.status(401).json({ error: 'Unauthorized' });
-        }
-        const { name } = request.body;
-        const { type } = request.body;
-        const { parentId } = request.body;
-        const isPublic = request.body.isPublic || false;
-        const { data } = request.body;
-        if (!name) {
-            return response.status(400).json({ error: 'Missing name' });
-        }
-        if (!type) {
-            return response.status(400).json({ error: 'Missing type' });
-        }
-        if (type !== 'folder' && !data) {
-            return response.status(400).json({ error: 'Missing data' });
-        }
+        upload.array('images', 10)(request, response, async (err) => {
+            if (err) {
+                return response.status(500).json({ error: err.message });
+            }
+            const { img_per_page } = request.body;
+            if (!img_per_page) return response.status(400).json({ error: "Missing Max image per page" });
 
-        // const files = dbClient.db.collection('files');
-        // if (parentId) {
-        //     const idObject = new ObjectID(parentId);
-        //     const file = await files.findOne({ _id: idObject, userId: user._id });
-        //     if (!file) {
-        //         return response.status(400).json({ error: 'Parent not found' });
-        //     }
-        //     if (file.type !== 'folder') {
-        //         return response.status(400).json({ error: 'Parent is not a folder' });
-        //     }
-        // }
-        // if (type === 'folder') {
-        //     files.insertOne(
-        //         {
-        //             userId: user._id,
-        //             name,
-        //             type,
-        //             parentId: parentId || 0,
-        //             isPublic,
-        //         },
-        //     ).then((result) => response.status(201).json({
-        //         id: result.insertedId,
-        //         userId: user._id,
-        //         name,
-        //         type,
-        //         isPublic,
-        //         parentId: parentId || 0,
-        //     })).catch((error) => {
-        //         console.log(error);
-        //     });
-        // } else {
-        //     const filePath = process.env.FOLDER_PATH || '/tmp/files_manager';
-        //     const fileName = `${filePath}/${uuidv4()}`;
-        //     const buff = Buffer.from(data, 'base64');
-        //     // const storeThis = buff.toString('utf-8');
-        //     try {
-        //         try {
-        //             await fs.mkdir(filePath);
-        //         } catch (error) {
-        //             // pass. Error raised when file already exists
-        //         }
-        //         await fs.writeFile(fileName, buff, 'utf-8');
-        //     } catch (error) {
-        //         console.log(error);
-        //     }
-        //     files.insertOne(
-        //         {
-        //             userId: user._id,
-        //             name,
-        //             type,
-        //             isPublic,
-        //             parentId: parentId || 0,
-        //             localPath: fileName,
-        //         },
-        //     ).then((result) => {
-        //         response.status(201).json(
-        //             {
-        //                 id: result.insertedId,
-        //                 userId: user._id,
-        //                 name,
-        //                 type,
-        //                 isPublic,
-        //                 parentId: parentId || 0,
-        //             },
-        //         );
-        //         if (type === 'image') {
-        //             fileQueue.add(
-        //                 {
-        //                     userId: user._id,
-        //                     fileId: result.insertedId,
-        //                 },
-        //             );
-        //         }
-        //     }).catch((error) => console.log(error));
-        // }
-        return true;
+            const files = request.files;
+            if (files?.length === 0) {
+                return response.status(400).json({ error: 'No files in request' });
+            }
+
+            try {
+                const pdfDoc = await PDFDocument.create();
+                let page = null;
+                let imagesPerPage = parseInt(img_per_page, 10);
+
+                for (let i = 0; i < files.length; i++) {
+                    if (i % imagesPerPage === 0) {
+                        page = pdfDoc.addPage();
+                    }
+                    const imageBuffer = await sharp(files[i].buffer).jpeg().toBuffer();
+                    const img = await pdfDoc.embedJpg(imageBuffer);
+                    const { width, height } = img.scale(0.5);
+                    page.drawImage(img, {
+                        x: 50,
+                        y: page.getHeight() - (i % imagesPerPage + 1) * height - 50,
+                        width,
+                        height,
+                    });
+                }
+
+                const pdfBytes = await pdfDoc.save();
+                const blob = bucket.file(`uploaded_${uuidv4()}.pdf`);
+                const blobStream = blob.createWriteStream();
+
+                blobStream.on('error', (err) => {
+                    console.error(err);
+                    return response.status(500).json({ error: err.message });
+                });
+
+                blobStream.on('finish', () => {
+                    response.status(200).json({ message: "PDF uploaded successfully" });
+                });
+
+                blobStream.end(pdfBytes);
+            } catch (error) {
+                console.error(error);
+                response.status(500).json({ error: error.message });
+            }
+        });
     }
 
     static async getFile(request, response) {
-        console.log(request, response,'the response and request')
-        // const { id } = request.params;
-        // const files = dbClient.db.collection('files');
-        // const idObject = new ObjectID(id);
-        // files.findOne({ _id: idObject }, async (err, file) => {
-        //     if (!file) {
-        //         return response.status(404).json({ error: 'Not found' });
-        //     }
-        //     console.log(file.localPath);
-        //     if (file.isPublic) {
-        //         if (file.type === 'folder') {
-        //             return response.status(400).json({ error: "A folder doesn't have content" });
-        //         }
-        //         try {
-        //             let fileName = file.localPath;
-        //             const size = request.param('size');
-        //             if (size) {
-        //                 fileName = `${file.localPath}_${size}`;
-        //             }
-        //             const data = await fs.readFile(fileName);
-        //             const contentType = mime.contentType(file.name);
-        //             return response.header('Content-Type', contentType).status(200).send(data);
-        //         } catch (error) {
-        //             console.log(error);
-        //             return response.status(404).json({ error: 'Not found' });
-        //         }
-        //     } else {
-        //         const user = await FilesController.getUser(request);
-        //         if (!user) {
-        //             return response.status(404).json({ error: 'Not found' });
-        //         }
-        //         if (file.userId.toString() === user._id.toString()) {
-        //             if (file.type === 'folder') {
-        //                 return response.status(400).json({ error: "A folder doesn't have content" });
-        //             }
-        //             try {
-        //                 let fileName = file.localPath;
-        //                 const size = request.param('size');
-        //                 if (size) {
-        //                     fileName = `${file.localPath}_${size}`;
-        //                 }
-        //                 const contentType = mime.contentType(file.name);
-        //                 return response.header('Content-Type', contentType).status(200).sendFile(fileName);
-        //             } catch (error) {
-        //                 console.log(error);
-        //                 return response.status(404).json({ error: 'Not found' });
-        //             }
-        //         } else {
-        //             console.log(`Wrong user: file.userId=${file.userId}; userId=${user._id}`);
-        //             return response.status(404).json({ error: 'Not found' });
-        //         }
-        //     }
-        // });
+        console.log(request, response, 'the response and request');
     }
 }
 
