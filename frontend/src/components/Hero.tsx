@@ -15,6 +15,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useMutation } from 'react-query';
 import axios from 'axios';
+import { on } from 'events';
 
 const StyledBox = styled('div')(({ theme }) => ({
   alignSelf: 'center',
@@ -44,6 +45,7 @@ const StyledBox = styled('div')(({ theme }) => ({
 
 export default function Hero() {
   const [open, setOpen] = React.useState(false);
+  const [files, setFiles] = React.useState<FileList | null>(null); // Add this state
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -55,22 +57,55 @@ export default function Hero() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      console.log(files);
+      setFiles(files); // Set the files when changed
+
     }
   }
 
   const mutation = useMutation((data: FormData) =>
-    axios.post('http://localhost:5000', data, {
+    axios.post('http://localhost:5000/api/v1/files/', data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     })
   );
-  
+
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    mutation.mutate(formData);
+    // const formJson = Object.fromEntries((formData as any).entries());
+    // console.log(formData, formJson,'the formdata and the form json');
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append('images', files[i]); // Append each file to the form data
+      }
+    }
+    mutation.mutate(formData, {
+      onSuccess: (data: any) => {
+        console.log(data);
+        // Extract the fileName from the response
+        const fileName = data?.data?.fileName;
+        // Construct the URL for the GET request
+        const url = `http://127.0.0.1:5000/api/v1/files/${fileName}`;
+        // Make the GET request
+        fetch(url)
+          .then(response => response.blob())
+          .then(blob => {
+            // Create a blob URL and download the file
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = fileName;
+            link.click();
+          })
+          .catch(error => console.error(error));
+        return data;
+      },
+
+      onError: (error: any) => {
+        console.error(error);
+      }
+    });
   }
   return (
     <Box
@@ -175,14 +210,6 @@ export default function Hero() {
           onClose={handleClose}
           PaperProps={{
             component: 'form',
-            // onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-            //   event.preventDefault();
-            //   const formData = new FormData(event.currentTarget);
-            //   const formJson = Object.fromEntries((formData as any).entries());
-            //   // const email = formJson.email;
-            //   console.log(formData, formJson,'the formdata and the form json');
-            //   // handleClose();
-            // },
             onSubmit: onSubmit
           }}
         >
@@ -196,7 +223,7 @@ export default function Hero() {
               required
               margin="dense"
               id="name"
-              name="number"
+              name="img_per_page"
               label="Number of images per page"
               type="number"
               fullWidth
