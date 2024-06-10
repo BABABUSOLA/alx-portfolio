@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
@@ -15,7 +16,6 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useMutation } from 'react-query';
 import axios from 'axios';
-import { on } from 'events';
 
 const StyledBox = styled('div')(({ theme }) => ({
   alignSelf: 'center',
@@ -97,8 +97,10 @@ export default function Hero() {
             link.href = blobUrl;
             link.download = fileName;
             link.click();
+            handleClose();
           })
           .catch(error => console.error(error));
+
         return data;
       },
 
@@ -239,9 +241,10 @@ export default function Hero() {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit">Submit</Button>
-          </DialogActions>
+            <Button onClick={handleClose} disabled={mutation.isLoading}>Cancel</Button>
+            <Button type="submit" disabled={mutation.isLoading}>
+              {mutation.isLoading ? <CircularProgress size={24} /> : 'Submit'}
+            </Button>          </DialogActions>
         </Dialog>
       </Container>
     </Box>
