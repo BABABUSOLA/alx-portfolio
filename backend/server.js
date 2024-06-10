@@ -4,7 +4,7 @@ const router = require("./routes/index.js");
 const cors = require("cors");
 const app = express();
 
-const port = parseInt(process.env.PORT, 10) || 5000;
+const port = parseInt(process.env.PORT, 10) || 8080;
 
 app.use(cors()); //enable cors
 app.use(express.json());
