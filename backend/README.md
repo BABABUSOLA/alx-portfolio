@@ -62,3 +62,10 @@ gcloud builds submit --pack image=gcr.io/PROJECT-ID/SERVICE-NAME
 
 # Deploy the image to Cloud Run
 gcloud run deploy SERVICE-NAME --image gcr.io/PROJECT-ID/SERVICE-NAME --region REGION
+
+
+## -----------------------------------------------------
+
+For the env: key.json, get from the secret key of the project
+On you local, run  `export GOOGLE_APPLICATION_CREDENTIAL=key.json`
+Then run you npm run start
