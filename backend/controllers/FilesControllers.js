@@ -1,17 +1,35 @@
 const { v4: uuidv4 } = require('uuid');
+const os = require("os");
 const { Storage } = require("@google-cloud/storage");
 const multer = require("multer");
 const { PDFDocument, rgb } = require('pdf-lib');
 const sharp = require('sharp');
-const accessSecret = require('../secret.js');
+const { accessSecret , cloud_storage_secret_key} = require('../secret.js');
+const fs = require("fs");
+const path = require("path");
 
-const secret  = await accessSecret();
-const storage = new Storage({
-    credentials: secret
+async function getSecret() {
+    try {
+        const secret = await accessSecret("cloud-storage-secret-key");
+        return secret;
+    } catch (error) {
+        console.error('Failed to get secret:', error);
+    }
+}
+let bucket;
+let tempFilePath;
+
+getSecret().then(secret => {
+    // Write the secret to a temporary file.
+    tempFilePath = path.join(os.tmpdir(), 'keyfile.json');
+    fs.writeFileSync(tempFilePath, JSON.stringify(secret));
+
+    const storage = new Storage({
+        keyFile: tempFilePath
+    });
+    bucket = storage.bucket("alx_portfolio_image_to_pdf_converter");
+    // Rest of your code...
 });
-
-const bucket = storage.bucket("alx_portfolio_image_to_pdf_converter");
-
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -149,5 +167,13 @@ class FilesControllers {
         }
     }
 }
-
+process.on('exit', () => {
+    try {
+      // Delete the temporary file.
+      fs.unlinkSync(tempFilePath);
+      console.log('Temporary file deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete temporary file:', error);
+    }
+  });
 module.exports = FilesControllers;
