@@ -58,11 +58,15 @@ export default function Hero() {
   };
 
   const mutation = useMutation((data: FormData) =>
-    axios.post("http://localhost:8000/api/v1/files/", data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
+    axios.post(
+      "https://alx-portfolio-image-to-pdf-483870948389.africa-south1.run.app/api/v1/files/",
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    )
   );
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -88,7 +92,7 @@ export default function Hero() {
     mutation.mutate(formData, {
       onSuccess: (data: any) => {
         const fileName = data?.data?.fileName;
-        const url = `http://localhost:8000/api/v1/files/${fileName}`;
+        const url = `https://alx-portfolio-image-to-pdf-483870948389.africa-south1.run.app/api/v1/files/${fileName}`;
         fetch(url)
           .then((response) => response.blob())
           .then((blob) => {
