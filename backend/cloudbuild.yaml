@@ -4,12 +4,16 @@ steps:
       [
         "build",
         "-t",
-        "gcr.io/${PROJECT_ID}/alx-portfolio-image-to-pdf",
+        "gcr.io/${PROJECT_ID}/alx-portfolio-image-to-pdf/alx-portfolio-image-to-pdf",
         "./backend",
       ]
 
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "gcr.io/${PROJECT_ID}/alx-portfolio-image-to-pdf"]
+    args:
+      [
+        "push",
+        "gcr.io/${PROJECT_ID}/alx-portfolio-image-to-pdf/alx-portfolio-image-to-pdf",
+      ]
 
   - name: "gcr.io/cloud-builders/gcloud"
     args:
@@ -18,7 +22,7 @@ steps:
         "deploy",
         "alx-portfolio-image-to-pdf",
         "--image",
-        "gcr.io/${PROJECT_ID}/alx-portfolio-image-to-pdf",
+        "gcr.io/${PROJECT_ID}/alx-portfolio-image-to-pdf/alx-portfolio-image-to-pdf",
         "--region",
         "us-central1",
         "--platform",
@@ -27,7 +31,7 @@ steps:
       ]
 
 images:
-  - "gcr.io/${PROJECT_ID}/alx-portfolio-image-to-pdf"
+  - "gcr.io/${PROJECT_ID}/alx-portfolio-image-to-pdf/alx-portfolio-image-to-pdf"
 
 options:
   logging: CLOUD_LOGGING_ONLY
